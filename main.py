@@ -1,4 +1,4 @@
-import sys
+
 import time
 from algorithm.bubble_sort import bubble_sort
 from algorithm.binary_search import binary_search
@@ -6,7 +6,7 @@ from algorithm.dijkstra import dijkstra
 from algorithm.knapsack import knapsack
 from visualize.display import print_colored_array, print_colored_text, print_dp_table
 
-# Import matplotlib functions with availability check
+
 try:
     from visualize.animation import plot_array, plot_graph, MATPLOTLIB_AVAILABLE
 except ImportError:
@@ -31,8 +31,9 @@ def display_menu():
     print_colored_text("="*50, "\033[94m")
 
 
+# Helper Functions for User Input
 def get_user_input(prompt, input_type=str):
-    """Get validated user input"""
+    """Get user input with validation"""
     while True:
         try:
             value = input(f"{prompt}: ").strip()
@@ -45,11 +46,11 @@ def get_user_input(prompt, input_type=str):
 
 
 def get_array_input():
-    """Get array input from user"""
-    print("\nEnter array elements (comma-separated):")
+    """Get array of numbers from user"""
+    print("\nEnter numbers separated by commas (e.g., 5,2,8,1,9):")
     while True:
         try:
-            arr_input = input("Array: ").strip()
+            arr_input = input("Numbers: ").strip()
             if not arr_input:
                 print("Please enter some numbers.")
                 continue
@@ -102,197 +103,166 @@ def get_graph_input():
             print("Please enter a valid graph format.")
 
 
-def run_sorting_algorithms():
-    """Handle sorting algorithm menu"""
-    print("\nSorting Algorithms:")
-    print("1. Bubble Sort")
-    print("2. Back to main menu")
+# Algorithm Demonstrations
+def demonstrate_bubble_sort():
+    """Demonstrate Bubble Sort algorithm"""
+    print("\n=== BUBBLE SORT DEMONSTRATION ===")
+    print("Bubble Sort compares adjacent elements and swaps them if they're in wrong order.")
     
-    choice = get_user_input("Choose sorting algorithm (1-2)", int)
+    # Get input from user
+    arr = get_array_input()
+    print(f"\nOriginal array: {arr}")
     
-    if choice == 1:
-        arr = get_array_input()
-        print(f"\nOriginal array: {arr}")
-        
-        # Terminal visualization
-        def terminal_viz(arr, i, j):
-            print_colored_text(f"Comparing {arr[i]} and {arr[j]}", "\033[93m")
-            print_colored_array(arr, [i, j], "\033[91m")
-            time.sleep(0.5)
-        
-        print_colored_text("\nBubble Sort Visualization:", "\033[92m")
-        
-        # Time the algorithm execution
-        start_time = time.time()
-        bubble_sort(arr.copy(), terminal_viz)
-        end_time = time.time()
-        execution_time = end_time - start_time
-        
-        print_colored_text(f"Final sorted array: {arr}", "\033[92m")
-        print_colored_text(f"⏱️  Execution time: {execution_time:.4f} seconds", "\033[96m")
-        
-        # Ask for matplotlib visualization if available
-        if MATPLOTLIB_AVAILABLE and input("\nShow matplotlib visualization? (y/n): ").lower() == 'y':
-            def plot_viz(arr, i, j):
-                plot_array(arr, [i, j], f"Bubble Sort - Comparing {arr[i]} and {arr[j]}")
-                time.sleep(0.5)
-            
-            bubble_sort(arr.copy(), plot_viz)
-        elif not MATPLOTLIB_AVAILABLE:
-            print_colored_text("\nMatplotlib not available. Install with: pip install matplotlib", "\033[93m")
+    # Create visualization function
+    def show_step(arr, i, j):
+        print_colored_text(f"Comparing {arr[i]} and {arr[j]}", "\033[93m")
+        print_colored_array(arr, [i, j], "\033[91m")
+        time.sleep(0.5)
+    
+    # Run algorithm with timing
+    print_colored_text("\nSorting process:", "\033[92m")
+    start_time = time.time()
+    bubble_sort(arr.copy(), show_step)
+    end_time = time.time()
+    
+    print_colored_text(f"Final sorted array: {arr}", "\033[92m")
+    print_colored_text(f"⏱️  Time taken: {end_time - start_time:.4f} seconds", "\033[96m")
 
 
-def run_search_algorithms():
-    """Handle search algorithm menu"""
-    print("\nSearch Algorithms:")
-    print("1. Binary Search")
-    print("2. Back to main menu")
+def demonstrate_binary_search():
+    """Demonstrate Binary Search algorithm"""
+    print("\n=== BINARY SEARCH DEMONSTRATION ===")
+    print("Binary Search finds an element in a sorted array by repeatedly dividing the search space.")
     
-    choice = get_user_input("Choose search algorithm (1-2)", int)
+    # Get input from user
+    arr = get_array_input()
+    arr.sort()  # Binary search requires sorted array
+    print(f"\nSorted array: {arr}")
     
-    if choice == 1:
-        arr = get_array_input()
-        arr.sort()  # Binary search requires sorted array
-        print(f"\nSorted array: {arr}")
-        
-        target = get_user_input("Enter target to search", int)
-        
-        def terminal_viz(arr, left, right, mid):
-            print_colored_text(f"Searching range [{left}:{right}], mid={mid}, value={arr[mid]}", "\033[93m")
-            highlight = list(range(left, right + 1))
-            print_colored_array(arr, highlight, "\033[91m")
-            print_colored_array(arr, [mid], "\033[92m")
-            time.sleep(0.8)
-        
-        print_colored_text("\nBinary Search Visualization:", "\033[92m")
-        
-        # Time the algorithm execution
-        start_time = time.time()
-        result = binary_search(arr, target, terminal_viz)
-        end_time = time.time()
-        execution_time = end_time - start_time
-        
-        if result != -1:
-            print_colored_text(f"Found {target} at index {result}!", "\033[92m")
+    target = get_user_input("Enter number to search for", int)
+    
+    # Create visualization function
+    def show_step(arr, left, right, mid):
+        print_colored_text(f"Searching range [{left}:{right}], mid={mid}, value={arr[mid]}", "\033[93m")
+        highlight = list(range(left, right + 1))
+        print_colored_array(arr, highlight, "\033[91m")
+        print_colored_array(arr, [mid], "\033[92m")
+        time.sleep(0.8)
+    
+    # Run algorithm with timing
+    print_colored_text("\nSearch process:", "\033[92m")
+    start_time = time.time()
+    result = binary_search(arr, target, show_step)
+    end_time = time.time()
+    
+    # Show results
+    if result != -1:
+        print_colored_text(f"Found {target} at index {result}!", "\033[92m")
+    else:
+        print_colored_text(f"{target} not found in array.", "\033[91m")
+    
+    print_colored_text(f"⏱️  Time taken: {end_time - start_time:.4f} seconds", "\033[96m")
+
+
+def demonstrate_dijkstra():
+    """Demonstrate Dijkstra's Shortest Path algorithm"""
+    print("\n=== DIJKSTRA'S ALGORITHM DEMONSTRATION ===")
+    print("Dijkstra finds the shortest path from a start node to all other nodes.")
+    
+    # Get graph input
+    graph = get_graph_input()
+    print(f"\nGraph: {graph}")
+    
+    start_node = get_user_input("Enter start node", str)
+    
+    # Create visualization function
+    def show_step(distances, visited, current):
+        print_colored_text(f"Current node: {current}", "\033[93m")
+        print_colored_text(f"Visited: {visited}", "\033[92m")
+        print_colored_text(f"Distances: {distances}", "\033[94m")
+        time.sleep(1)
+    
+    # Run algorithm with timing
+    print_colored_text("\nFinding shortest paths:", "\033[92m")
+    start_time = time.time()
+    distances = dijkstra(graph, start_node, show_step)
+    end_time = time.time()
+    
+    # Show results
+    print_colored_text(f"\nShortest distances from {start_node}:", "\033[92m")
+    for node, dist in distances.items():
+        if dist == float('inf'):
+            print(f"{node}: ∞ (unreachable)")
         else:
-            print_colored_text(f"{target} not found in array.", "\033[91m")
-        
-        print_colored_text(f"⏱️  Execution time: {execution_time:.4f} seconds", "\033[96m")
+            print(f"{node}: {dist}")
+    
+    print_colored_text(f"⏱️  Time taken: {end_time - start_time:.4f} seconds", "\033[96m")
 
 
-def run_graph_algorithms():
-    """Handle graph algorithm menu"""
-    print("\nGraph Algorithms:")
-    print("1. Dijkstra's Algorithm")
-    print("2. Back to main menu")
+def demonstrate_knapsack():
+    """Demonstrate 0/1 Knapsack Dynamic Programming algorithm"""
+    print("\n=== 0/1 KNAPSACK DEMONSTRATION ===")
+    print("Knapsack problem: maximize value while staying within weight capacity.")
     
-    choice = get_user_input("Choose graph algorithm (1-2)", int)
+    # Get input
+    print("\nEnter knapsack data:")
+    weights = get_array_input()
+    values = get_array_input()
+    capacity = get_user_input("Enter knapsack capacity", int)
     
-    if choice == 1:
-        graph = get_graph_input()
-        print(f"\nGraph: {graph}")
-        
-        start_node = get_user_input("Enter start node", str)
-        
-        def terminal_viz(distances, visited, current):
-            print_colored_text(f"Current node: {current}", "\033[93m")
-            print_colored_text(f"Visited: {visited}", "\033[92m")
-            print_colored_text(f"Distances: {distances}", "\033[94m")
-            time.sleep(1)
-        
-        print_colored_text("\nDijkstra's Algorithm Visualization:", "\033[92m")
-        
-        # Time the algorithm execution
-        start_time = time.time()
-        distances = dijkstra(graph, start_node, terminal_viz)
-        end_time = time.time()
-        execution_time = end_time - start_time
-        
-        print_colored_text(f"\nFinal distances from {start_node}:", "\033[92m")
-        for node, dist in distances.items():
-            if dist == float('inf'):
-                print(f"{node}: ∞ (unreachable)")
-            else:
-                print(f"{node}: {dist}")
-        
-        print_colored_text(f"⏱️  Execution time: {execution_time:.4f} seconds", "\033[96m")
-        
-        # Ask for matplotlib visualization if available
-        if MATPLOTLIB_AVAILABLE and input("\nShow matplotlib visualization? (y/n): ").lower() == 'y':
-            def plot_viz(distances, visited, current):
-                plot_graph(distances, visited, current)
-                time.sleep(1)
-            
-            dijkstra(graph, start_node, plot_viz)
-        elif not MATPLOTLIB_AVAILABLE:
-            print_colored_text("\nMatplotlib not available. Install with: pip install matplotlib", "\033[93m")
+    print(f"\nWeights: {weights}")
+    print(f"Values: {values}")
+    print(f"Capacity: {capacity}")
+    
+    # Create visualization function
+    def show_step(dp, i, w):
+        print_colored_text(f"Filling dp[{i}][{w}]", "\033[93m")
+        print_dp_table(dp, i, w)
+        time.sleep(0.5)
+    
+    # Run algorithm with timing
+    print_colored_text("\nBuilding solution table:", "\033[92m")
+    start_time = time.time()
+    max_value = knapsack(weights, values, capacity, show_step)
+    end_time = time.time()
+    
+    print_colored_text(f"Maximum value: {max_value}", "\033[92m")
+    print_colored_text(f"⏱️  Time taken: {end_time - start_time:.4f} seconds", "\033[96m")
 
 
-def run_dynamic_programming():
-    """Handle dynamic programming algorithm menu"""
-    print("\nDynamic Programming Algorithms:")
-    print("1. 0/1 Knapsack Problem")
-    print("2. Back to main menu")
-    
-    choice = get_user_input("Choose DP algorithm (1-2)", int)
-    
-    if choice == 1:
-        print("\nEnter knapsack problem data:")
-        weights = get_array_input()
-        values = get_array_input()
-        capacity = get_user_input("Enter knapsack capacity", int)
-        
-        print(f"\nWeights: {weights}")
-        print(f"Values: {values}")
-        print(f"Capacity: {capacity}")
-        
-        def terminal_viz(dp, i, w):
-            print_colored_text(f"Filling dp[{i}][{w}]", "\033[93m")
-            print_dp_table(dp, i, w)
-            time.sleep(0.5)
-        
-        print_colored_text("\n0/1 Knapsack Visualization:", "\033[92m")
-        
-        # Time the algorithm execution
-        start_time = time.time()
-        max_value = knapsack(weights, values, capacity, terminal_viz)
-        end_time = time.time()
-        execution_time = end_time - start_time
-        
-        print_colored_text(f"Maximum value: {max_value}", "\033[92m")
-        print_colored_text(f"⏱️  Execution time: {execution_time:.4f} seconds", "\033[96m")
 
 
 def main():
-    """Main function to run the Algorithm Visualizer"""
+    """Main function - Simple Algorithm Visualizer"""
     print_colored_text("Welcome to Algorithm Visualizer!", "\033[95m")
-    print_colored_text("Explore algorithms through interactive visualizations.", "\033[94m")
+    print_colored_text("Learn algorithms through step-by-step visualizations.", "\033[94m")
     
     while True:
         try:
+            # Show menu
             display_menu()
-            choice = get_user_input("Enter your choice (1-5)", int)
+            choice = get_user_input("Choose algorithm to learn (1-5)", int)
             
+            # Run selected algorithm
             if choice == 1:
-                run_sorting_algorithms()
+                demonstrate_bubble_sort()
             elif choice == 2:
-                run_search_algorithms()
+                demonstrate_binary_search()
             elif choice == 3:
-                run_graph_algorithms()
+                demonstrate_dijkstra()
             elif choice == 4:
-                run_dynamic_programming()
+                demonstrate_knapsack()
             elif choice == 5:
-                print_colored_text("\nThank you for using Algorithm Visualizer!", "\033[95m")
-                print_colored_text("Happy learning! 🚀", "\033[94m")
+                print_colored_text("\nThank you for learning with us! 🚀", "\033[95m")
                 break
             else:
-                print_colored_text("Invalid choice. Please enter 1-5.", "\033[91m")
+                print_colored_text("Please choose 1-5.", "\033[91m")
                 
         except KeyboardInterrupt:
-            print_colored_text("\n\nExiting...", "\033[91m")
+            print_colored_text("\nGoodbye! 👋", "\033[91m")
             break
         except Exception as e:
-            print_colored_text(f"An error occurred: {e}", "\033[91m")
+            print_colored_text(f"Error: {e}", "\033[91m")
             print("Please try again.")
 
 
