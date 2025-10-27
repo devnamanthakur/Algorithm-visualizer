@@ -1,7 +1,17 @@
-import matplotlib.pyplot as plt
-import numpy as np
+try:
+    import matplotlib.pyplot as plt
+    import numpy as np
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+    print("Warning: matplotlib not available. Graphical visualizations will be disabled.")
+    print("To enable matplotlib visualizations, install with: pip install matplotlib")
 
 def plot_array(arr, highlight_indices=None, title="Array Visualization"):
+    if not MATPLOTLIB_AVAILABLE:
+        print("Matplotlib not available. Skipping graphical visualization.")
+        return
+    
     highlight_indices = highlight_indices or []
     colors = ['skyblue' if i not in highlight_indices else 'orange' for i in range(len(arr))]
     plt.figure(figsize=(8,4))
@@ -13,6 +23,10 @@ def plot_array(arr, highlight_indices=None, title="Array Visualization"):
 
 
 def plot_graph(distances, visited, current=None):
+    if not MATPLOTLIB_AVAILABLE:
+        print("Matplotlib not available. Skipping graphical visualization.")
+        return
+        
     plt.figure(figsize=(6,4))
     nodes = list(distances.keys())
     dists = [distances[n] if distances[n] != float('inf') else 0 for n in nodes]

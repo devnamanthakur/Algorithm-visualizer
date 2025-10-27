@@ -5,7 +5,16 @@ from algorithm.binary_search import binary_search
 from algorithm.dijkstra import dijkstra
 from algorithm.knapsack import knapsack
 from visualize.display import print_colored_array, print_colored_text, print_dp_table
-from visualize.animation import plot_array, plot_graph
+
+# Import matplotlib functions with availability check
+try:
+    from visualize.animation import plot_array, plot_graph, MATPLOTLIB_AVAILABLE
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+    def plot_array(*args, **kwargs):
+        print("Matplotlib not available. Skipping graphical visualization.")
+    def plot_graph(*args, **kwargs):
+        print("Matplotlib not available. Skipping graphical visualization.")
 
 
 def display_menu():
@@ -63,12 +72,15 @@ def get_graph_input():
                 continue
             
             graph = {}
+            all_nodes = set()  # Track all nodes (both sources and destinations)
+            
             nodes = graph_input.split(';')
             for node_data in nodes:
                 if ':' not in node_data:
                     continue
                 node, neighbors = node_data.split(':', 1)
                 node = node.strip()
+                all_nodes.add(node)  # Add source node
                 graph[node] = []
                 
                 if neighbors.strip():
@@ -77,7 +89,13 @@ def get_graph_input():
                         if i + 1 < len(neighbor_pairs):
                             neighbor = neighbor_pairs[i].strip()
                             weight = int(neighbor_pairs[i + 1].strip())
+                            all_nodes.add(neighbor)  # Add destination node
                             graph[node].append((neighbor, weight))
+            
+            # Ensure all nodes exist in the graph (even if they have no outgoing edges)
+            for node in all_nodes:
+                if node not in graph:
+                    graph[node] = []
             
             return graph
         except (ValueError, IndexError):
@@ -103,16 +121,25 @@ def run_sorting_algorithms():
             time.sleep(0.5)
         
         print_colored_text("\nBubble Sort Visualization:", "\033[92m")
-        bubble_sort(arr.copy(), terminal_viz)
-        print_colored_text(f"Final sorted array: {arr}", "\033[92m")
         
-        # Ask for matplotlib visualization
-        if input("\nShow matplotlib visualization? (y/n): ").lower() == 'y':
+        # Time the algorithm execution
+        start_time = time.time()
+        bubble_sort(arr.copy(), terminal_viz)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        
+        print_colored_text(f"Final sorted array: {arr}", "\033[92m")
+        print_colored_text(f"⏱️  Execution time: {execution_time:.4f} seconds", "\033[96m")
+        
+        # Ask for matplotlib visualization if available
+        if MATPLOTLIB_AVAILABLE and input("\nShow matplotlib visualization? (y/n): ").lower() == 'y':
             def plot_viz(arr, i, j):
                 plot_array(arr, [i, j], f"Bubble Sort - Comparing {arr[i]} and {arr[j]}")
                 time.sleep(0.5)
             
             bubble_sort(arr.copy(), plot_viz)
+        elif not MATPLOTLIB_AVAILABLE:
+            print_colored_text("\nMatplotlib not available. Install with: pip install matplotlib", "\033[93m")
 
 
 def run_search_algorithms():
@@ -138,12 +165,19 @@ def run_search_algorithms():
             time.sleep(0.8)
         
         print_colored_text("\nBinary Search Visualization:", "\033[92m")
+        
+        # Time the algorithm execution
+        start_time = time.time()
         result = binary_search(arr, target, terminal_viz)
+        end_time = time.time()
+        execution_time = end_time - start_time
         
         if result != -1:
             print_colored_text(f"Found {target} at index {result}!", "\033[92m")
         else:
             print_colored_text(f"{target} not found in array.", "\033[91m")
+        
+        print_colored_text(f"⏱️  Execution time: {execution_time:.4f} seconds", "\033[96m")
 
 
 def run_graph_algorithms():
@@ -167,7 +201,12 @@ def run_graph_algorithms():
             time.sleep(1)
         
         print_colored_text("\nDijkstra's Algorithm Visualization:", "\033[92m")
+        
+        # Time the algorithm execution
+        start_time = time.time()
         distances = dijkstra(graph, start_node, terminal_viz)
+        end_time = time.time()
+        execution_time = end_time - start_time
         
         print_colored_text(f"\nFinal distances from {start_node}:", "\033[92m")
         for node, dist in distances.items():
@@ -176,13 +215,17 @@ def run_graph_algorithms():
             else:
                 print(f"{node}: {dist}")
         
-        # Ask for matplotlib visualization
-        if input("\nShow matplotlib visualization? (y/n): ").lower() == 'y':
+        print_colored_text(f"⏱️  Execution time: {execution_time:.4f} seconds", "\033[96m")
+        
+        # Ask for matplotlib visualization if available
+        if MATPLOTLIB_AVAILABLE and input("\nShow matplotlib visualization? (y/n): ").lower() == 'y':
             def plot_viz(distances, visited, current):
                 plot_graph(distances, visited, current)
                 time.sleep(1)
             
             dijkstra(graph, start_node, plot_viz)
+        elif not MATPLOTLIB_AVAILABLE:
+            print_colored_text("\nMatplotlib not available. Install with: pip install matplotlib", "\033[93m")
 
 
 def run_dynamic_programming():
@@ -209,8 +252,15 @@ def run_dynamic_programming():
             time.sleep(0.5)
         
         print_colored_text("\n0/1 Knapsack Visualization:", "\033[92m")
+        
+        # Time the algorithm execution
+        start_time = time.time()
         max_value = knapsack(weights, values, capacity, terminal_viz)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        
         print_colored_text(f"Maximum value: {max_value}", "\033[92m")
+        print_colored_text(f"⏱️  Execution time: {execution_time:.4f} seconds", "\033[96m")
 
 
 def main():
